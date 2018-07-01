@@ -18,6 +18,7 @@
   "homepage": "https://github.com/ChampionOfGoats/sshamer#readme",
   "dependencies": {
     "debug": "^3.1.0",
+    "dotenv": "^6.0.0",
     "express": "^4.16.3",
     "geoip-lite": "^1.2.2",
     "jsonfile": "^4.0.0",

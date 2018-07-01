@@ -1,10 +1,16 @@
+/**
+* SSHamer
+* A utility for mapping failed SSH logins
+* Cache management and authorisation log watcher
+*/
+
 const Tail = require('tail').Tail;
 const jsonfile = require('jsonfile');
 const debug = require('debug')('authwatch');
 const geoip = require('geoip-lite');
 
-const authLogFile = '/var/log/auth.log';
-const cacheFile = './cache.json';
+const authLogFile = process.env.AUTHLOG;
+const cacheFile = process.env.CACHEJSON;
 
 /** regex for extracting sshd lines from auth log */
 const rgx = /(?:sshd).+(?:Invalid user|Failed password).+(\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b)/;

@@ -1,6 +1,10 @@
-/*****************************
- * 
- */
+/**
+* SSHamer
+* A utility for mapping failed SSH logins
+* Server entry point
+*/
+
+require('dotenv').config();
 
 /** modules */
 const express = require('express');
