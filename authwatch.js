@@ -6,7 +6,7 @@
 
 const Tail = require('tail').Tail;
 const jsonfile = require('jsonfile');
-const debug = require('debug')('authwatch');
+const debug = require('debug')('sshamer:authwatch');
 const geoip = require('geoip-lite');
 
 const authLogFile = process.env.AUTHLOG;

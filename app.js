@@ -8,7 +8,7 @@ require('dotenv').config();
 
 /** modules */
 const express = require('express');
-const debug = require('debug')('app');
+const debug = require('debug')('sshamer:application');
 const path = require('path');
 
 debug('starting auth watch');
@@ -29,4 +29,7 @@ debug('configuring server');
 const app = express();
 app.use('/', express.static(path.join(__dirname, './static')));
 require('./routes.js')(app, authWatcher);
-app.listen(3000, () => debug('listening on port 3000'));
+app.listen({
+    host: process.env.INTERFACE,
+    port: process.env.PORT
+}, () => debug(`listening on ${process.env.INTERFACE}:${process.env.PORT}`));
