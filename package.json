@@ -1,0 +1,26 @@
+{
+  "name": "sshamer",
+  "version": "1.0.0",
+  "description": "Displays graphically failed SSH login attempts.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChampionOfGoats/sshamer.git"
+  },
+  "author": "Leif Walker-Grant (ChampionOfGoats)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChampionOfGoats/sshamer/issues"
+  },
+  "homepage": "https://github.com/ChampionOfGoats/sshamer#readme",
+  "dependencies": {
+    "debug": "^3.1.0",
+    "express": "^4.16.3",
+    "geoip-lite": "^1.2.2",
+    "jsonfile": "^4.0.0",
+    "tail": "^1.2.4"
+  }
+}
