@@ -53,3 +53,7 @@ DEBUG=* node app.js
 # or specify the DEBUG classes in .env
 DEBUG=sshamer:*
 ```
+
+## Contributing
+
+Yes, please! I'd be particularly interested in changes to help this tool support Windows servers. Fork the repo and submit a pull request, bish bash bosh.
