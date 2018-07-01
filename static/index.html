@@ -1,37 +1,118 @@
 <html>
-    <head>
-        <title>SSHamer</title>
-        <link rel="stylesheet" href="leaflet.css">
-        <script src="leaflet.js"></script>
-        <script src="leaflet-heat.js"></script>
-        <script src="jquery.min.js"></script>
-    </head>
-    <body>
-        <div style="height: 100%;"id="map" class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom"></div>
-        <script>
 
-            var points = [];
-            var map = L.map('map').setView([0, 0], 2);
+<head>
+    <title>SSHamer</title>
+    <link rel="stylesheet" href="leaflet.css">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css">
+    <script src="leaflet.js"></script>
+    <script src="leaflet-heat.js"></script>
+    <script src="jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
+    <script>
+        window.addEventListener("load", function () {
+            window.cookieconsent.initialise({
+                "palette": {
+                    "popup": {
+                        "background": "#252e39"
+                    },
+                    "button": {
+                        "background": "#14a7d0"
+                    }
+                },
+                "theme": "classic",
+                "position": "bottom-right"
+            })
+        });
+    </script>
+</head>
 
+<body>
+    <div class="card fixed-bottom mx-sm-2 my-sm-2 text-white bg-dark" style="width: 25rem;">
+        <div class="card-body">
+            <h5 class="card-title">SSHamer</h5>
+            <h6 class="card-subtitle mb-2 text-muted">A utility for mapping failed SSH logins</h6>
+            <a href="#" class="card-link" onclick="refresh();">Refresh now</a>
+            <a href="#" class="card-link" id="enable-heat-map">Hide heatmap</a>
+            <a href="#" class="card-link" id="enable-markers">Show markers</a>
+        </div>
+        <div class="card-footer">
+            <small class="text-muted" id="last-updated">last-updated</small>
+        </div>
+    </div>
+    <div style="height: 100%;" id="map" class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom">
+    </div>
+    <script src="bootstrap.min.js"></script>
+    <script>
+        var map = L.map('map').setView([0, 0], 2);
+        var heatmap;
+        var enableHeatMap = true;
+        var enableMarkers = false;
+        var interval;
+
+        $('#enable-heat-map').click(() => {
+            enableHeatMap = !enableHeatMap;
+            $('#enable-heat-map').text(enableHeatMap ? 'hide heatmap' : 'show heatmap');
+            refresh();
+            genInterval();
+        });
+
+        $('#enable-markers').click(() => {
+            enableMarkers = !enableMarkers;
+            $('#enable-markers').text(enableMarkers ? 'hide markers' : 'show markers');
+            refresh();
+            genInterval();
+        });
+
+        const genInterval = () => {
+            clearInterval(interval);
+            interval = setInterval(() => refresh(), 1000 * 60 * 60);
+        }
+
+        const refresh = () => {
             $.getJSON('/raw', (res) => {
+                var points = [];
+
+                map.eachLayer(function (layer) {
+                    map.removeLayer(layer);
+                });
 
                 /* extract data and generate heat map points */
                 for (var key in res) {
                     var addr = res[key];
                     points.push(addr.location.concat(addr.occurrences));
+
+                    /* create markers, if enabled - can be resource intensive if there's a lot */
+                    if (enableMarkers) {
+                        L.marker(addr.location)
+                            .bindPopup(`${key}: ${addr.occurrences} attempts`)
+                            .addTo(map);
+                    }
                 }
 
-                /* set up heatmap from received data points */
-                var heat = L.heatLayer(points, {
-                    radius: 25,
-                    blur: 20
-                }).addTo(map);
+                /* set up heatmap from received data points, if enabled */
+                if (enableHeatMap) {
+                    L.heatLayer(points, {
+                        radius: 25,
+                        blur: 20
+                    }).addTo(map);
+                }
 
                 /* set up map tiles */
                 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
+
+                var date = new Date();
+                $('#last-updated').text(`Refreshed at ${date.toLocaleString({ timeZone: 'UTC' })}`);
             });
-        </script>
-    </body>
+        }
+
+        refresh();
+
+        genInterval();
+    </script>
+
+</body>
+
 </html>

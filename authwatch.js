@@ -9,9 +9,9 @@ const cacheFile = './cache.json';
 /** regex for extracting sshd lines from auth log */
 const rgx = /(?:sshd).+(?:Invalid user|Failed password).+(\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b)/;
 
+/* processes an existing auth log if no cache file exists */
 const processExistingAuthLog = (cache) => {
     debug(`generating auth log cache from ${authLogFile}`);
-    /** todo: process entire auth log if no cache exists */
     var lines = require('fs').readFileSync(authLogFile, 'utf-8')
     .split('\n')
     .filter(Boolean);
@@ -21,16 +21,17 @@ const processExistingAuthLog = (cache) => {
     });
 }
 
+/* tries to get data from geoip, returns lat-long on success or null island on failure */
 const getLocationFromIp = (ip) => {
     var geo = geoip.lookup(ip);
     return (geo != null) ? geo.ll : [0, 0];
 }
 
+/* given a line from auth log, attempts to extract ssh data and computes the cache item */
 const processAuthLogLine = (line, cache) => {
     var matches = line.match(rgx);
 
     if (matches != null) {
-        debug('found a match!');
         var ip = matches[1]; // first capturing group is IP address
         if (ip in cache) {
             cache[ip].occurrences++;
@@ -46,6 +47,9 @@ const processAuthLogLine = (line, cache) => {
 /* might extend this later */
 const processAuthLogError = (error) => debug('error: ', error);
 
+/** AuthWatcher module implements cache management and tailing of the auth logs
+ * provides api to load/save the cache file
+ */
 module.exports = class AuthWatcher {
 
     constructor() {
@@ -64,6 +68,7 @@ module.exports = class AuthWatcher {
             this._cache = jsonfile.readFileSync(cacheFile);
         } catch(e) {
             debug(`failed to load cache: ${e.message}`);
+            debug(`attempting to recreate cache file`);
             processExistingAuthLog(this._cache);
             this.save();
         }
