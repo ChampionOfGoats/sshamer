@@ -28,7 +28,7 @@ const getLocationFromIp = (ip) => {
 const processAuthLogLine = (line, cache) => {
     var matches = line.match(rgx);
 
-    if (match != null) {
+    if (matches != null) {
         var ip = matches[1]; // first capturing group is IP address
         if (ip in cache) {
             cache[ip].occurrences++;
